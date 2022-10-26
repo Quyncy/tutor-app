@@ -11,7 +11,10 @@ class UserAdminConfig(UserAdmin):
 
     fieldsets = (
         (None, {'fields':('email', 'username', 'first_name', 'last_name','role',)}),
-        ('Permissions', {'fields': ('is_staff', 'is_active','is_superuser',)}),
+        ('Permissions', {
+            'fields':
+            ('is_staff', 'is_active','is_superuser',
+        )}),
     )
 
     add_fieldsets = (
@@ -21,9 +24,11 @@ class UserAdminConfig(UserAdmin):
         }),
     )
 
+
+
 # Teacher-View
 class TeacherView(UserAdmin):
-    list_display = ('username', 'first_name', 'last_name', 'role',)
+    list_display = ('username','email', 'first_name', 'last_name', 'role',)
 
     fieldsets = (
         (None, {'fields':('email', 'username', 'first_name', 'last_name','role',)}),
@@ -39,7 +44,7 @@ class TeacherView(UserAdmin):
 
 # Teacher-View
 class StudentView(UserAdmin):
-    list_display = ('username', 'first_name', 'last_name', 'role',)
+    list_display = ('username', 'email', 'first_name', 'last_name', 'role',)
 
     fieldsets = (
         (None, {'fields':('email', 'username', 'first_name', 'last_name','role',)}),
@@ -53,9 +58,18 @@ class StudentView(UserAdmin):
         }),
     )
 
+class StudentProfileView(admin.ModelAdmin):
+    list_display = ('user', 'kurs',)
+    list_filter = ('kurs',)
+
+
+class TeacherProfileView(admin.ModelAdmin):
+    list_display = ('user')
+
 admin.site.register(Dozent)
 admin.site.register(Module)
+admin.site.register(StudentProfile, StudentProfileView)
 admin.site.register(Student, StudentView)
-admin.site.register(StudentMore)
 admin.site.register(Teacher, TeacherView)
+admin.site.register(TeacherProfile)
 admin.site.register(User, UserAdminConfig)

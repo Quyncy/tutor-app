@@ -43,7 +43,7 @@ class Student(User):
 
     @property
     def more(self):
-        return self.studentmore
+        return self.studentprofile
 
     class Meta:
         proxy = True
@@ -103,31 +103,27 @@ class TeacherProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     teacher_id = models.IntegerField(null=True, blank=True)
 
-# wartet auf ein Signal, sobald ein Teacher gespeichert wird ein TeacherProfile erstellt
-@receiver(post_save, sender=Teacher)
+    def __str__(self):
+        return f"{self.user.username} {self.user.email}"
+
+# wartet auf ein Signal, sobald ein User gespeichert wird ein StudentProfile oder TeacherProfile erstellt
+@receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created and instance.role == "TEACHER":
         TeacherProfile.objects.create(user=instance)
-
-
-class StudentProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    student_id = models.IntegerField(null=True, blank=True)
-
-# wartet auf ein Signal, sobald ein Student gespeichert wird ein StudentProfile erstellt
-@receiver(post_save, sender=Student)
-def create_user_profile(sender, instance, created, **kwargs):
     if created and instance.role == "STUDENT":
         StudentProfile.objects.create(user=instance)
 
-
 # Weitere Informationen über Studenten zB. Arbeitsstunden
-class StudentMore(models.Model):
-    user = models.OneToOneField(Student, on_delete=models.CASCADE)
+class StudentProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    student_id = models.IntegerField(null=True, blank=True)
     kurs = models.OneToOneField(Module, on_delete=models.CASCADE, null=True)
     work_hours = models.FloatField()
     anzahl_korrekturen = models.IntegerField()
 
     def __str__(self):
         return self.user.first_name
+
+
 
