@@ -3,51 +3,25 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
-# class UserManager(BaseUserManager):
-#     def create_user(self, email, username, first_name, last_name, role, password, **other_fields):
-#         user = self.model(
-#             email=email,
-#             username=username,
-#             first_name=first_name,
-#             last_name=last_name,
-#             role=role,
-#             **other_fields,
-#         )
-#         user.set_password(password)
-#         user.save(using= self._db)
-#         return user
-
-#     def create_superuser(self, email, username, first_name, last_name, role, password, **other_fields):
-#         other_fields.setdefault('is_staff', True)
-#         other_fields.setdefault('is_superuser', True)
-#         other_fields.setdefault('is_admin', True)
-
-#         if other_fields.get('is_staff') is not True:
-#             raise ValueError('Superuser must be assigned to is_staff = True.')
-#         if other_fields.get('is_superuser') is not True:
-#             raise ValueError('Superuser must be addigned to is_superuser = True.')
-
-#         return self.create_user(email, username, first_name, last_name, password, role, **other_fields)
-
-
 ###############
 # Beim hinzufügen der Daten wird die rolle als admin zugewiesen, wenn
 # die Daten bearbeitet werden, dann wird es wieder korrigiert
 class User(AbstractUser):
     class Role(models.TextChoices):
-        ADMIN = "ADMIN", "Admin"
-        STUDENT = "STUDENT", "Student"
-        TEACHER = "TEACHER", "Teacher"
+        ADMIN = "ADMIN", 'Admin'
+        STUDENT = "STUDENT", 'Student'
+        TEACHER = "TEACHER", 'Teacher'
 
     base_user = Role.ADMIN
 
     # Welche Rolle hat der User
-    role = models.CharField(("Role"), max_length=10, choices=Role.choices, default=base_user)
+    role = models.CharField(("Role"), max_length=10, choices=Role.choices)
+    name = models.CharField(blank=True, max_length=255)
 
     def save(self, *args, **kwargs):
-        if not self.id:
-             self.role = self.base_user
+        if self.pk:
+            self.role = self.base_user
+            print("Im pk")
         return super().save(*args, **kwargs)
 
 
@@ -64,6 +38,7 @@ class StudentManager(models.Manager):
 
 class Student(User):
     base_role = User.Role.STUDENT
+
     student = StudentManager()
 
     @property
@@ -111,7 +86,7 @@ class Module(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
 
     SEMESTER_CHOICES = [
-        ('WS', 'Wintersemester'),   # WS wird in die Datenbank gespeichert und Wintersemester wird User angezeigt
+        ('WS', 'Wintersemester'),   # 'WS'/'SS' wird in die Datenbank gespeichert und Wintersemester oder Sommersemester wird User angezeigt
         ('SS', 'Sommersemester'),
     ]
 
@@ -128,9 +103,22 @@ class TeacherProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     teacher_id = models.IntegerField(null=True, blank=True)
 
+# wartet auf ein Signal, sobald ein Teacher gespeichert wird ein TeacherProfile erstellt
+@receiver(post_save, sender=Teacher)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.role == "TEACHER":
+        TeacherProfile.objects.create(user=instance)
+
+
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     student_id = models.IntegerField(null=True, blank=True)
+
+# wartet auf ein Signal, sobald ein Student gespeichert wird ein StudentProfile erstellt
+@receiver(post_save, sender=Student)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.role == "STUDENT":
+        StudentProfile.objects.create(user=instance)
 
 
 # Weitere Informationen über Studenten zB. Arbeitsstunden
@@ -143,13 +131,3 @@ class StudentMore(models.Model):
     def __str__(self):
         return self.user.first_name
 
-
-@receiver(post_save, sender=Teacher)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created and instance.role == "TEACHER":
-        TeacherProfile.objects.create(user=instance)
-
-@receiver(post_save, sender=Student)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created and instance.role == "STUDENT":
-        StudentProfile.objects.create(user=instance)

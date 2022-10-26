@@ -33,7 +33,7 @@ class TeacherView(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide'),
-            'fields': ('email', 'username', 'first_name', 'last_name', 'role', 'password', 'is_active', 'is_staff','is_superuser',)
+            'fields': ('email', 'username', 'first_name', 'last_name', 'role', 'password1', 'password2', 'is_active', 'is_staff','is_superuser',)
         }),
     )
 
@@ -49,7 +49,7 @@ class StudentView(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide'),
-            'fields': ('email', 'username', 'first_name', 'last_name', 'role', 'password', 'is_active', 'is_staff','is_superuser',)
+            'fields': ('email', 'username', 'first_name', 'last_name', 'role', 'password1', 'password2', 'is_active', 'is_staff','is_superuser',)
         }),
     )
 
