@@ -4,14 +4,38 @@ from django.utils.translation import gettext_lazy as _
 
 from user.models import *
 
-class DozentForm(forms.Form):
+from django.contrib import admin
+
+class StudentForm(forms.ModelForm):
+
+    class Meta:
+        model = Student
+        exclude = ['username','date_joined','last_login',]
+
+class TeacherForm(forms.ModelForm):
+
+    class Meta:
+        model = Teacher
+        exclude = ['username','date_joined','last_login',]
+
+class UserForm(forms.ModelForm):
+    """ Bei Admin eingaben werden die fields ignoriert """
+    class Meta:
+        model = User
+        exclude = ['username','date_joined','last_login',]
+
+# class PersonAdmin(admin.ModelAdmin):
+#     form = StudentForm
+
+
+class DozentForm(forms.ModelForm):
     class Meta:
         model = Dozent
         fields = '__all__'
         labels = {
-            'title': _('Enter title'),
-            'name': _('Enter first_name'),
-            'last_name': _('Enter last name'),
+            'title': _('Titel eingeben'),
+            'name': _('Vorname eingeben'),
+            'nachname': _('Nachname eingeben'),
         }
         error_messages = {
             'title':{
@@ -22,3 +46,38 @@ class DozentForm(forms.Form):
             },
             'nachname': _('Last name has to be entered')
         },
+
+
+class ModuleForm(forms.ModelForm):
+    class Meta:
+        model = Module
+        fields = '__all__'
+        # exclude=
+
+        # labels := Bezeichnung
+        labels = {
+            'module_name': _('Kursname eingeben'),
+            'description': _('Beschreibung eingegeben'),
+            'dozent': _('Dozent eingeben'),
+            'teacher': _('Kursleiter eingeben'),
+            'semester': _('Semester eingegeben'),
+        }
+        error_messages = {
+            fields : {
+                'module_name': {
+                    'required': _('Module name has to be entered')
+                },
+                'description': {
+                    'required': _('Description has to be entered')
+                },
+                'dozent': {
+                    'required': _('Dozent has to be entered')
+                },
+                'Teacher': {
+                    'required': _('Teacher has to be entered')
+                },
+                'semester': {
+                    'required': _('Semester has to be entered')
+                },
+            }
+        }

@@ -1,12 +1,35 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+
+# class UserManager(BaseUserManager):
+#     def create_user(self, email,password, **extrafields):
+#         user = self.model(
+#             email=self.normalize_email(email),
+#             **extrafields,
+#         )
+#         user.set_password(password)
+#         user.save(using=self.db)
+#         return user
+
+#     def create_superuser(self, username, email, first_name, last_name, password, **extrafields):
+#         self.create_user(
+#             email,
+#             password,
+#         )
+#         self.is_admin=True
+#         self.is_staff=True
+#         self.is_active=True
+#         user.save(using=self.db)
+#         return user
+
 
 ###############
 # Beim hinzufügen der Daten wird die rolle als admin zugewiesen, wenn
 # die Daten bearbeitet werden, dann wird es wieder korrigiert
-class User(AbstractUser):
+class User(AbstractUser, PermissionsMixin):
     class Role(models.TextChoices):
         ADMIN = "ADMIN", 'Admin'
         STUDENT = "STUDENT", 'Student'
@@ -17,6 +40,8 @@ class User(AbstractUser):
     # Welche Rolle hat der User
     role = models.CharField(("Role"), max_length=10, choices=Role.choices)
     name = models.CharField(blank=True, max_length=255)
+
+
 
     def save(self, *args, **kwargs):
         if self.pk:
@@ -124,6 +149,4 @@ class StudentProfile(models.Model):
 
     def __str__(self):
         return self.user.first_name
-
-
 
