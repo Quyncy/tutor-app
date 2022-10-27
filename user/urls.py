@@ -8,8 +8,10 @@ urlpatterns = [
     path('dozent/', views.dozent, name='dozent'),
     path('module/', views.module, name='module'),
     path('student/', views.student, name='student'),
-    path('teacher/', views.student, name='student'),
-    path('user/', views.student, name='student'),
+    path('studentprofile/', views.studentprofile, name='studentprofile'),
+    path('teacher/', views.teacher, name='teacher'),
+    path('teacherprofile/', views.teacherprofile, name='teacherprofile'),
+    path('user/', views.user, name='user'),
 
 
     # Ok - Erfolgreich gespeichert

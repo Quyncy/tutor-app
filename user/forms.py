@@ -7,13 +7,30 @@ from user.models import *
 from django.contrib import admin
 
 class StudentForm(forms.ModelForm):
-
     class Meta:
         model = Student
         exclude = ['username','date_joined','last_login',]
 
-class TeacherForm(forms.ModelForm):
+class StudentProfileForm(forms.ModelForm):
+    class Meta:
+        model=StudentProfile
+        fields='__all__'
 
+        label = {
+            'user': _('Vorname'),
+            'student_id': _('ID'),
+            'kurs': _('Kurs'),
+            'work_hours': _('Arbeitsstunden'),
+            'anzahl_korrekturen': _('Anzahl Korrekturen'),
+        }
+        error_messages = {
+            'user':{
+                'required': ('Vorname angeben')
+            }
+        }
+
+
+class TeacherForm(forms.ModelForm):
     class Meta:
         model = Teacher
         exclude = ['username','date_joined','last_login',]
@@ -26,6 +43,15 @@ class UserForm(forms.ModelForm):
 
 # class PersonAdmin(admin.ModelAdmin):
 #     form = StudentForm
+
+class TeacherProfileForm(forms.ModelForm):
+    class Meta:
+        model = TeacherProfile
+        fields = '__all__'
+        label = {
+            'user': _('User'),
+            'teacher_id': _('Teacher ID'),
+        }
 
 
 class DozentForm(forms.ModelForm):

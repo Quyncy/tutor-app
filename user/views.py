@@ -50,6 +50,60 @@ def student(request):
     return render(request, 'user/form.html', context)
 
 
+def studentprofile(request):
+    student_form = StudentProfileForm()
+
+    if request.POST:
+        student_form = StudentProfileForm(request.POST)
+
+        if student_form.is_valid():
+            student_form.save()
+            return redirect(reverse('ok'))
+
+    context={"form":student_form}
+    return render(request, 'user/form.html', context)
+
+
+def teacher(request):
+    student_form = TeacherForm()
+
+    if request.POST:
+        student_form = TeacherForm(request.POST)
+
+        if student_form.is_valid():
+            student_form.save()
+            return redirect(reverse('ok'))
+
+    context={"form":student_form}
+    return render(request, 'user/form.html', context)
+
+
+def teacherprofile(request):
+    student_form = TeacherProfileForm()
+
+    if request.POST:
+        student_form = TeacherProfileForm(request.POST)
+
+        if student_form.is_valid():
+            student_form.save()
+            return redirect(reverse('ok'))
+
+    context={"form":student_form}
+    return render(request, 'user/form.html', context)
+
+
+def user(request):
+    student_form = UserForm()
+
+    if request.POST:
+        student_form = UserForm(request.POST)
+
+        if student_form.is_valid():
+            student_form.save()
+            return redirect(reverse('ok'))
+
+    context={"form":student_form}
+    return render(request, 'user/form.html', context)
 
 
 

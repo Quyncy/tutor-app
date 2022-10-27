@@ -125,7 +125,7 @@ class Module(models.Model):
 
 
 class TeacherProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(Teacher, on_delete=models.CASCADE)
     teacher_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
