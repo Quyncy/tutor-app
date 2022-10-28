@@ -33,7 +33,7 @@ def module(request):
             return redirect(reverse('ok'))
 
     context = {'form': module_form, }
-    return render(request, 'user/module.html', context)
+    return render(request, 'user/form.html', context)
 
 
 def student(request):
@@ -65,50 +65,48 @@ def studentprofile(request):
 
 
 def teacher(request):
-    student_form = TeacherForm()
+    teacher_form = TeacherForm()
 
     if request.POST:
-        student_form = TeacherForm(request.POST)
+        teacher_form = TeacherForm(request.POST)
 
-        if student_form.is_valid():
-            student_form.save()
+        if teacher_form.is_valid():
+            teacher_form.save()
             return redirect(reverse('ok'))
 
-    context={"form":student_form}
+    context={"form":teacher_form}
     return render(request, 'user/form.html', context)
 
 
 def teacherprofile(request):
-    student_form = TeacherProfileForm()
+    teacherprofile_form = TeacherProfileForm()
 
     if request.POST:
-        student_form = TeacherProfileForm(request.POST)
+        teacherprofile_form = TeacherProfileForm(request.POST)
 
-        if student_form.is_valid():
-            student_form.save()
+        if teacherprofile_form.is_valid():
+            teacherprofile_form.save()
             return redirect(reverse('ok'))
 
-    context={"form":student_form}
+    context={"form":teacherprofile_form}
     return render(request, 'user/form.html', context)
 
 
 def user(request):
-    student_form = UserForm()
+    user_form = UserForm()
 
     if request.POST:
-        student_form = UserForm(request.POST)
+        user_form = UserForm(request.POST)
 
-        if student_form.is_valid():
-            student_form.save()
+        if user_form.is_valid():
+            user_form.save()
             return redirect(reverse('ok'))
 
-    context={"form":student_form}
+    context={"form":user_form}
     return render(request, 'user/form.html', context)
 
 
-
-
-
+# Ok-Seiten zum erfolreichen gespeichern
 def ok(request):
     context={}
     return render(request, 'user/ok.html', context)

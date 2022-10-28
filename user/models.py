@@ -41,7 +41,9 @@ class User(AbstractUser, PermissionsMixin):
     role = models.CharField(("Role"), max_length=10, choices=Role.choices)
     name = models.CharField(blank=True, max_length=255)
 
-
+    # if role == 'ADMIN': is_superuser =True
+    # if role == 'STUDENT': is_superuser =False
+    # if role == 'TEACHER': is_superuser =False
 
     def save(self, *args, **kwargs):
         if self.pk:
