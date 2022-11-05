@@ -3,11 +3,68 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from user.forms import *
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import authenticate, login
+from .forms import LoginForm
+from django.http import HttpResponse
 
-# @login_required
+
+
+# from django.contrib.auth import authenticate, login
+# from django.contrib.auth import logout
+
+# # user login
+# def my_view(request):
+#     email = request.POST['email']
+#     password = request.POST['password']
+#     user = authenticate(request, email=email, password=password)
+#     if user is not None:
+#         login(request, user)
+#         # Redirect to a success page.
+#         context={}
+#         #redirect(reverse('home'))
+#         return render(request, 'user/ok.html', context)
+#     else:
+#         # Return an 'invalid login' error message.
+#         pass
+
+
+# def logout_view(request):
+#     logout(request)
+#     # Redirect to a success page
+
+@login_required
+def dashboard(request):
+    return render(request, 'user/dashboard.html', {'section': 'dashboard'})
+
+def user_login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+        user = authenticate(request,
+                            email = data['email'],
+                            password = data['password'])
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return redirect(reverse('admin'))
+            else:
+                return HttpResponse('Account nicht vorhanden.')
+        else:
+            return HttpResponse('Passwort oder Email falsch.')
+    else:
+        form = LoginForm()
+    return render(request, 'user/login.html', {'form': form})
+
+
+def register(request):
+    context = {}
+    return render(request, 'user/register.html', context)
+
+
 def dozent(request):
     dozent_form = DozentForm()
     error_message = ""
@@ -21,7 +78,7 @@ def dozent(request):
     context={'form':dozent_form, }
     return render(request, 'user/dozent.html', context)
 
-# @login_required
+
 def module(request):
     module_form = ModuleForm()
 
@@ -49,7 +106,7 @@ def student(request):
     context={"form":student_form}
     return render(request, 'user/form.html', context)
 
-
+@login_required
 def studentprofile(request):
     student_form = StudentProfileForm()
 

@@ -6,21 +6,17 @@ from user.models import *
 
 # User-View
 class UserAdminConfig(UserAdmin):
-    list_display = ('username', 'first_name', 'last_name', 'role',)
+    list_display = ('username', 'email', 'role',)
     list_filter = ('role',)
 
     fieldsets = (
-        (None, {'fields':('email', 'username', 'first_name', 'last_name','role',)}),
-        ('Permissions', {
-            'fields':
-            ('is_staff', 'is_active','is_superuser',
-        )}),
+        (None, {'fields':('email', 'role',)}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide'),
-            'fields': ('email', 'username', 'first_name', 'last_name', 'role', 'password1', 'password2', 'is_active', 'is_staff','is_superuser',)
+            'fields': ('email', 'username', 'password1', 'password2', 'is_active',)
         }),
     )
 
@@ -28,33 +24,33 @@ class UserAdminConfig(UserAdmin):
 
 # Teacher-View
 class TeacherView(UserAdmin):
-    list_display = ('username','email', 'first_name', 'last_name', 'role',)
+    list_display = ('username','email', 'role',)
 
     fieldsets = (
-        (None, {'fields':('email', 'username', 'first_name', 'last_name','role',)}),
-        ('Permissions', {'fields': ('is_staff', 'is_active',)}),
+        (None, {'fields':('username', 'email','role',)}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide'),
-            'fields': ('email', 'username', 'first_name', 'last_name', 'role', 'password1', 'password2', 'is_active', 'is_staff','is_superuser',)
+            'fields': ('email', 'username', 'password1', 'password2',)
         }),
     )
 
 # Teacher-View
+
 class StudentView(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'role',)
+    list_display = ('username', 'email', 'role',)
+    list_filter = ('username', 'email')
 
     fieldsets = (
-        (None, {'fields':('email', 'username', 'first_name', 'last_name','role',)}),
-        ('Permissions', {'fields': ('is_staff', 'is_active',)}),
+        (None, {'fields':('username', 'email', 'role',)}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide'),
-            'fields': ('email', 'username', 'first_name', 'last_name', 'role', 'password1', 'password2', 'is_active', 'is_staff','is_superuser',)
+            'fields': ('email', 'username', 'password1', 'password2', )
         }),
     )
 
@@ -64,9 +60,13 @@ class StudentProfileView(admin.ModelAdmin):
 
 
 class TeacherProfileView(admin.ModelAdmin):
-    list_display = ('user')
+    list_display = ('user', 'module_name',)
 
-admin.site.register(Dozent)
+class DozentView(admin.ModelAdmin):
+    list_display = ('name', 'nachname',)
+
+
+admin.site.register(Dozent, DozentView)
 admin.site.register(Module)
 admin.site.register(StudentProfile, StudentProfileView)
 admin.site.register(Student, StudentView)
