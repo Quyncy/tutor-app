@@ -25,14 +25,14 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
-class StudentForm(forms.ModelForm):
+class TutorForm(forms.ModelForm):
     class Meta:
-        model = Student
+        model = Tutor
         exclude = ['username','date_joined','last_login',]
 
-class StudentProfileForm(forms.ModelForm):
+class TutorProfileForm(forms.ModelForm):
     class Meta:
-        model=StudentProfile
+        model=TutorProfile
         fields='__all__'
 
         label = {
@@ -49,9 +49,9 @@ class StudentProfileForm(forms.ModelForm):
         }
 
 
-class TeacherForm(forms.ModelForm):
+class KursleiterForm(forms.ModelForm):
     class Meta:
-        model = Teacher
+        model = Kursleiter
         exclude = ['username','date_joined','last_login',]
 
 class UserForm(forms.ModelForm):
@@ -63,13 +63,13 @@ class UserForm(forms.ModelForm):
 # class PersonAdmin(admin.ModelAdmin):
 #     form = StudentForm
 
-class TeacherProfileForm(forms.ModelForm):
+class KursleiterProfileForm(forms.ModelForm):
     class Meta:
-        model = TeacherProfile
+        model = KursleiterProfile
         fields = '__all__'
         label = {
             'user': _('User'),
-            'teacher_id': _('Teacher ID'),
+            'kursleiter_id': _('Kursleiter ID'),
         }
 
 
@@ -93,23 +93,23 @@ class DozentForm(forms.ModelForm):
         },
 
 
-class ModuleForm(forms.ModelForm):
+class KursForm(forms.ModelForm):
     class Meta:
-        model = Module
+        model = Kurs
         fields = '__all__'
         # exclude=
 
         # labels := Bezeichnung
         labels = {
-            'module_name': _('Kursname eingeben'),
+            'kurs_name': _('Kursname eingeben'),
             'description': _('Beschreibung eingegeben'),
             'dozent': _('Dozent eingeben'),
-            'teacher': _('Kursleiter eingeben'),
+            'kursleiter': _('Kursleiter eingeben'),
             'semester': _('Semester eingegeben'),
         }
         error_messages = {
             fields : {
-                'module_name': {
+                'kurs_name': {
                     'required': _('Module name has to be entered')
                 },
                 'description': {
@@ -118,7 +118,7 @@ class ModuleForm(forms.ModelForm):
                 'dozent': {
                     'required': _('Dozent has to be entered')
                 },
-                'Teacher': {
+                'Kursleiter': {
                     'required': _('Teacher has to be entered')
                 },
                 'semester': {

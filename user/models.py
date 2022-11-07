@@ -6,17 +6,17 @@ from django.template.defaultfilters import slugify
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, password, **extrafields):
+
+    def create_user(self, email, first_name, last_name, password, **extrafields):
         if not email:
             raise ValueError("Benutzer benötigt eine Email")
         if not password:
             raise ValueError("Benutzer benötigt ein Password")
-        if not username:
-            raise ValueError("Benutzer benötigt einen Namen")
 
         user = self.model(
             email=self.normalize_email(email),
-            username = username,
+            first_name=first_name,
+            last_name=last_name,
             **extrafields,
         )
         user.set_password(password)
@@ -24,13 +24,11 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, email, username, password, **extrafields):
+    def create_superuser(self, email, first_name, last_name, password, **extrafields):
         if not email:
             raise ValueError("Benutzer benötigt eine Email")
         if not password:
             raise ValueError("Benutzer benötigt ein Password")
-        if not username:
-            raise ValueError("Benutzer benötigt einen Namen")
 
         extrafields.setdefault('is_superuser', True)
         extrafields.setdefault('is_active', True)
@@ -38,7 +36,8 @@ class UserManager(BaseUserManager):
 
         user = self.create_user(
             email,
-            username,
+            first_name,
+            last_name,
             password,
             **extrafields,
         )
@@ -52,22 +51,25 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     class Role(models.TextChoices):
         ADMIN = "ADMIN", 'Admin'
-        STUDENT = "STUDENT", 'Student'
-        TEACHER = "TEACHER", 'Teacher'
+        TUTOR = "TUTOR", 'Tutor'
+        KURSLEITER = "KURSLEITER", 'Kursleiter'
 
     base_user = Role.ADMIN
 
     # Welche Rolle hat der User
-    role = models.CharField(("Role"), max_length=10, choices=Role.choices, default=base_user)
-    username = models.CharField(max_length=255, unique=True, blank=True)
+    role = models.CharField(("Rolle"), max_length=10, choices=Role.choices, default=base_user)
+    vorname = models.CharField(max_length=255, blank=True)
+    nachname = models.CharField(max_length=255, blank=True)
     email_confirmed = models.BooleanField(default=False)
     email = models.EmailField(unique=True)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    date_published = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS= ['username',]
+    REQUIRED_FIELDS= ['vorname', 'nachname',]
 
     objects = UserManager()
 
@@ -75,33 +77,33 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = "Benutzer"
 
     def save(self, *args, **kwargs):
-        if not self.id:
+        if self.id:
             self.role = self.base_user
             print(self.role)
         return super().save(*args, **kwargs)
 
 
-class TeacherManager(models.Manager):
+class KursleiterManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
         results = super().get_queryset(*args, **kwargs)
-        return results.filter(role=User.Role.TEACHER)
+        return results.filter(role=User.Role.KURSLEITER)
 
 
-class StudentManager(models.Manager):
+class TutorManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
         results = super().get_queryset(*args, **kwargs)
-        return results.filter(role=User.Role.STUDENT)
+        return results.filter(role=User.Role.TUTOR)
 
 
-class Student(User):
+class Tutor(User):
     """Tutoren im System"""
-    base_user = User.Role.STUDENT
+    base_user = User.Role.TUTOR
 
-    student = StudentManager()
+    tutor = TutorManager()
 
     @property
     def more(self):
-        return self.studentprofile
+        return self.tutorprofile
 
     class Meta:
         verbose_name_plural = "Tutoren"
@@ -111,11 +113,15 @@ class Student(User):
         return "Nur für Tutoren"
 
 
-class Teacher(User):
+class Kursleiter(User):
     """Kursleiter im System"""
-    base_user = User.Role.TEACHER
+    base_user = User.Role.KURSLEITER
 
-    teacher = TeacherManager()
+    kursleiter = KursleiterManager()
+
+    @property
+    def more(self):
+        return self.kursleiterprofile
 
     class Meta:
         verbose_name_plural = "Kursleiter"
@@ -128,28 +134,28 @@ class Teacher(User):
 class Dozent(models.Model):
     """Dozenten im System"""
     TITEL_CHOICES = [
-        ('Prof','Prof.'),
-        ('Dr', 'Dr.'),
+        ('Prof.','Prof.'),
+        ('Dr.', 'Dr.'),
     ]
 
-    titel = models.CharField(max_length=5, choices = TITEL_CHOICES, default='Prof')  # Auswahl Prof., Dr., Wiss. Mitarbeiter
-    name = models.CharField(max_length=50)
+    title = models.CharField(max_length=5, choices = TITEL_CHOICES, default='Prof.')  # Auswahl Prof., Dr., Wiss. Mitarbeiter
+    vorname = models.CharField(max_length=50)
     nachname = models.CharField(max_length=50)
 
     class Meta:
         verbose_name_plural = "Dozenten"
 
     def __str__(self):
-        return f"{self.name} {self.nachname}"
+        return f"{self.title} {self.vorname} {self.nachname}"
 
 
-class Module(models.Model):
+class Kurs(models.Model):
     """Kurse im System"""
     # field_of_study = Naturwissenschaften, Rechtswissenschaft
-    module_name = models.CharField(max_length=50)
-    description = models.TextField(default='')
+    kurs_name = models.CharField(max_length=50)
+    beschreibung = models.TextField(blank=True, null=True)
     dozent = models.ForeignKey(Dozent, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, blank=True, null=True)
+    kursleiter = models.ForeignKey(Kursleiter, on_delete=models.CASCADE, blank=True, null=True)
 
     SEMESTER_CHOICES = [
         ('WS', 'Wintersemester'),   # 'WS'/'SS' wird in die Datenbank gespeichert und Wintersemester oder Sommersemester wird User angezeigt
@@ -166,50 +172,52 @@ class Module(models.Model):
         verbose_name_plural = "Kurse"
 
     def __str__(self):
-        return f"{self.module_name}"
+        return f"{self.kurs_name}"
 
 
-class TeacherProfile(models.Model):
-    user = models.OneToOneField(Teacher, on_delete=models.CASCADE)
-    module_name = models.OneToOneField(Module, on_delete=models.CASCADE, null=True, blank=True)
+class KursleiterProfile(models.Model):
+    user = models.OneToOneField(Kursleiter, on_delete=models.CASCADE)
+    kurs_name = models.OneToOneField(Kurs, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Kursleiter Profile"
 
     def __str__(self):
-        return f"{self.user.username} {self.user.email}"
+        return f"{self.user.email}"
 
-
-# wartet auf ein Signal, sobald ein User gespeichert wird ein StudentProfile oder TeacherProfile erstellt
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created and instance.role == "TEACHER":
-        TeacherProfile.objects.create(user=instance)
-    if created and instance.role == "STUDENT":
-        StudentProfile.objects.create(user=instance)
-
-# wartet auf ein Signal, sobald ein Student gespeichert wird ein StudentProfile oder TeacherProfile erstellt
-@receiver(post_save, sender=Student)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created and instance.role == "STUDENT":
-        StudentProfile.objects.create(user=instance)
-
-# wartet auf ein Signal, sobald ein Teacher gespeichert wird ein StudentProfile oder TeacherProfile erstellt
-@receiver(post_save, sender=Teacher)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created and instance.role == "TEACHER":
-        # hier könnte Email versendet werden
-        TeacherProfile.objects.create(user=instance)
 
 # Weitere Informationen über Studenten zB. Arbeitsstunden
-class StudentProfile(models.Model):
-    user = models.OneToOneField(Student, on_delete=models.CASCADE)
-    kurs = models.OneToOneField(Module, on_delete=models.CASCADE, null=True)
-    work_hours = models.FloatField(default=0)
+class TutorProfile(models.Model):
+    user = models.OneToOneField(Tutor, on_delete=models.CASCADE)
+    kurs = models.OneToOneField(Kurs, on_delete=models.CASCADE, null=True)
+    arbeitsstunden = models.FloatField(default=0)
     anzahl_korrekturen = models.IntegerField(default=0)
 
     class Meta:
         verbose_name_plural = "Tutoren Profile"
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.first_name} {self.user.last_name}"
+
+
+# wartet auf ein Signal, sobald ein User gespeichert wird ein StudentProfile oder TeacherProfile erstellt
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.role == "KURSLEITER":
+        KursleiterProfile.objects.create(user=instance)
+    if created and instance.role == "TUTOR":
+        TutorProfile.objects.create(user=instance)
+
+# wartet auf ein Signal, sobald ein Student gespeichert wird ein StudentProfile oder TeacherProfile erstellt
+@receiver(post_save, sender=Tutor)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.role == "TUTOR":
+        TutorProfile.objects.create(user=instance)
+
+# wartet auf ein Signal, sobald ein Teacher gespeichert wird ein StudentProfile oder TeacherProfile erstellt
+@receiver(post_save, sender=Kursleiter)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.role == "KURSLEITER":
+        # hier könnte Email versendet werden
+        KursleiterProfile.objects.create(user=instance)
+

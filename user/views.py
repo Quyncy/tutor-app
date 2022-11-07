@@ -93,59 +93,59 @@ def module(request):
     return render(request, 'user/form.html', context)
 
 
-def student(request):
-    student_form = StudentForm()
+def tutor(request):
+    tutor_form = TutorForm()
 
     if request.POST:
-        student_form = StudentForm(request.POST)
+        tutor_form = TutorForm(request.POST)
 
-        if student_form.is_valid():
-            student_form.save()
+        if tutor_form.is_valid():
+            tutor_form.save()
             return redirect(reverse('ok'))
 
-    context={"form":student_form}
+    context={"form":tutor_form}
     return render(request, 'user/form.html', context)
 
 @login_required
-def studentprofile(request):
-    student_form = StudentProfileForm()
+def tutorprofile(request):
+    tutor_form = TutorProfileForm()
 
     if request.POST:
-        student_form = StudentProfileForm(request.POST)
+        tutor_form = TutorProfileForm(request.POST)
 
-        if student_form.is_valid():
-            student_form.save()
+        if tutor_form.is_valid():
+            tutor_form.save()
             return redirect(reverse('ok'))
 
-    context={"form":student_form}
+    context={"form":tutor_form}
     return render(request, 'user/form.html', context)
 
 
-def teacher(request):
-    teacher_form = TeacherForm()
+def kursleiter(request):
+    kursleiter_form = KursleiterForm()
 
     if request.POST:
-        teacher_form = TeacherForm(request.POST)
+        kursleiter_form = KursleiterForm(request.POST)
 
-        if teacher_form.is_valid():
-            teacher_form.save()
+        if kursleiter_form.is_valid():
+            kursleiter_form.save()
             return redirect(reverse('ok'))
 
-    context={"form":teacher_form}
+    context={"form":kursleiter_form}
     return render(request, 'user/form.html', context)
 
 
-def teacherprofile(request):
-    teacherprofile_form = TeacherProfileForm()
+def kursleiterprofile(request):
+    kursleiterprofile_form = KursleiterProfileForm()
 
     if request.POST:
-        teacherprofile_form = TeacherProfileForm(request.POST)
+        kursleiterprofile_form = KursleiterProfileForm(request.POST)
 
-        if teacherprofile_form.is_valid():
-            teacherprofile_form.save()
+        if kursleiterprofile_form.is_valid():
+            kursleiterprofile_form.save()
             return redirect(reverse('ok'))
 
-    context={"form":teacherprofile_form}
+    context={"form":kursleiterprofile_form}
     return render(request, 'user/form.html', context)
 
 

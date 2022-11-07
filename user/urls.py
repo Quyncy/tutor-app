@@ -7,10 +7,10 @@ urlpatterns = [
     # TESTE dozent, usw. FORM
     path('dozent/', views.dozent, name='dozent'),
     path('module/', views.module, name='module'),
-    path('student/', views.student, name='student'),
-    path('studentprofile/', views.studentprofile, name='studentprofile'),
-    path('teacher/', views.teacher, name='teacher'),
-    path('teacherprofile/', views.teacherprofile, name='teacherprofile'),
+    path('tutor/', views.tutor, name='tutor'),
+    path('tutorprofile/', views.tutorprofile, name='tutorprofile'),
+    path('kursleiter/', views.kursleiter, name='kursleiter'),
+    path('kursleiterprofile/', views.kursleiterprofile, name='kursleiterprofile'),
     path('user/', views.user, name='user'),
 
 
