@@ -57,7 +57,7 @@ class TutorView(UserAdmin):
     )
 
 class TutorProfileView(admin.ModelAdmin):
-    list_display = ('user', )
+    list_display = ('user',)
 
 
 class KursleiterProfileView(admin.ModelAdmin):

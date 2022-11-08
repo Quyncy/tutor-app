@@ -97,6 +97,7 @@ class TutorManager(models.Manager):
 
 class Tutor(User):
     """Tutoren im System"""
+    # Notiz: proxy models enthalten keine model fields
     base_user = User.Role.TUTOR
 
     tutor = TutorManager()
@@ -186,7 +187,7 @@ class KursleiterProfile(models.Model):
         return f"{self.user.email}"
 
 
-# Weitere Informationen über Studenten zB. Arbeitsstunden
+# Weitere Informationen über Tutor zB. Arbeitsstunden
 class TutorProfile(models.Model):
     user = models.OneToOneField(Tutor, on_delete=models.CASCADE)
     kurs = models.OneToOneField(Kurs, on_delete=models.CASCADE, null=True)
@@ -197,10 +198,10 @@ class TutorProfile(models.Model):
         verbose_name_plural = "Tutoren Profile"
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        return f"{self.user.vorname} {self.user.nachname}"
 
 
-# wartet auf ein Signal, sobald ein User gespeichert wird ein StudentProfile oder TeacherProfile erstellt
+# wartet auf ein Signal, sobald ein User gespeichert wird ein TutorProfile oder KursleiterProfile erstellt
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created and instance.role == "KURSLEITER":
@@ -208,13 +209,13 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created and instance.role == "TUTOR":
         TutorProfile.objects.create(user=instance)
 
-# wartet auf ein Signal, sobald ein Student gespeichert wird ein StudentProfile oder TeacherProfile erstellt
+# wartet auf ein Signal, sobald ein Tutor gespeichert wird ein TutorProfil erstellt
 @receiver(post_save, sender=Tutor)
 def create_user_profile(sender, instance, created, **kwargs):
     if created and instance.role == "TUTOR":
         TutorProfile.objects.create(user=instance)
 
-# wartet auf ein Signal, sobald ein Teacher gespeichert wird ein StudentProfile oder TeacherProfile erstellt
+# wartet auf ein Signal, sobald ein Kursleiter gespeichert wird ein KursleiterProfil erstellt
 @receiver(post_save, sender=Kursleiter)
 def create_user_profile(sender, instance, created, **kwargs):
     if created and instance.role == "KURSLEITER":

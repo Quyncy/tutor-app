@@ -1,7 +1,10 @@
 from django.urls import path
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from . import views
+from user import views
+from userAPI import views as viewsapi
+
+app_name = 'userAPI'
 
 urlpatterns = [
     # TESTE dozent, usw. FORM
@@ -18,4 +21,5 @@ urlpatterns = [
     path('ok/', views.ok, name='ok'),
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+
 ]
